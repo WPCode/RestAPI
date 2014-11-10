@@ -1,0 +1,42 @@
+from django.contrib.auth import get_user_model
+
+from rest_framework import serializers
+
+from rest_framework.reverse import reverse
+
+from .models import Object
+
+
+class ObjectSerializer(serializers.ModelSerializer):
+    
+    url = serializers.SerializerMethodField('get_url')
+    uid = serializers.SerializerMethodField('get_uid')
+
+    class Meta:
+        model = Object
+        fields = ('uid', 'firstName', 'lastName', 'dob', 'dod', 'url', )
+
+    def get_url(self, obj):
+        request = self.context['request']
+        return reverse('object-detail', kwargs={'pk': obj.pk}, request=request)
+
+    def get_uid(self, obj):
+
+        print obj.firstName
+        print obj.lastName
+        print obj.dob
+        print obj.dod
+        print obj.id
+
+        if not obj.firstName:
+            self.fields.pop('firstName', None)
+        if not obj.lastName:
+            self.fields.pop('lastName', None)
+        if not obj.dob:
+            self.fields.pop('dob', None)
+        if not obj.dod:
+            self.fields.pop('dod', None)
+        if not obj.id:
+            self.fields.pop('uid', None)
+
+        return obj.pk
